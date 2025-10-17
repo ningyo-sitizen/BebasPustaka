@@ -1,7 +1,6 @@
-// config.js
 const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
+const opac = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
@@ -10,4 +9,4 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-module.exports = pool;
+module.exports = opac;
