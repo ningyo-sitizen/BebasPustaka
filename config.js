@@ -9,4 +9,13 @@ const opac = mysql.createPool({
   connectionLimit: 10,
 });
 
-module.exports = opac;
+const bebaspustaka = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'bebaspustaka',
+  waitForConnections: true,
+  connectionLimit: 10,
+})
+
+module.exports = {opac,bebaspustaka};

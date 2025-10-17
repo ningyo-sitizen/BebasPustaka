@@ -4,10 +4,15 @@ const app = express();
 const PORT = 8080;
 
 const { getBooks } = require('./controller/useridcontroller');
+const { get_visitorCount_weekly } = require('./controller/visitorcount')
 
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'books.html'));
 });
+
+app.get('/weekly_visitor_page',(req,res) => {
+  res.sendFile(path.join(__dirname, 'public', 'weekly.html'))
+})
 
 app.get('/books', async (req, res) => {
   try {
@@ -21,6 +26,17 @@ app.get('/books', async (req, res) => {
     res.status(500).send('Database query failed');
   }
 });
+
+app.get('/weekly_visitor',async (req,res) =>{
+ try{
+  const data = await get_visitorCount_weekly();
+  res.json(data)
+ }catch(err){
+  console.error('lol')
+  res.status(500).send("database query failed")
+ }
+
+})
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
