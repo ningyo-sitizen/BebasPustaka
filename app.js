@@ -14,29 +14,6 @@ app.get('/weekly_visitor_page',(req,res) => {
   res.sendFile(path.join(__dirname, 'public', 'weekly.html'))
 })
 
-app.get('/books', async (req, res) => {
-  try {
-    const data = await getBooks();
-
-    console.log(JSON.stringify(data, null, 2));
-
-    res.json(data);
-  } catch (err) {
-    console.error('❌ Database error:', err);
-    res.status(500).send('Database query failed');
-  }
-});
-
-app.get('/weekly_visitor',async (req,res) =>{
- try{
-  const data = await get_visitorCount_weekly();
-  res.json(data)
- }catch(err){
-  console.error('lol')
-  res.status(500).send("database query failed")
- }
-
-})
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
