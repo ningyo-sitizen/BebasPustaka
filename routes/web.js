@@ -1,12 +1,13 @@
-const { getBooks } = require('./controller/useridcontroller');
-const { get_visitorCount_weekly } = require('./controller/visitorcount')
+const express = require('express');
+const router = express.Router();
+
+const { getBooks } = require('../controller/useridcontroller');
+const { get_visitorCount_weekly } = require('../controller/visitorcount')
 
 
-app.get('/books', async (req, res) => {
+router.get('/books', async (req, res) => {
   try {
     const data = await getBooks();
-
-    console.log(JSON.stringify(data, null, 2));
 
     res.json(data);
   } catch (err) {
@@ -15,7 +16,7 @@ app.get('/books', async (req, res) => {
   }
 });
 
-app.get('/weekly_visitor',async (req,res) =>{
+router.get('/weekly_visitor',async (req,res) =>{
  try{
   const data = await get_visitorCount_weekly();
   res.json(data)
@@ -25,3 +26,5 @@ app.get('/weekly_visitor',async (req,res) =>{
  }
 
 })
+
+module.exports = router;

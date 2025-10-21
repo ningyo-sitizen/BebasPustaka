@@ -1,8 +1,8 @@
 const db = require('../config');
-
+const {opac} = require('../config')
 
 async function getBooks() {
-  const [rows] = await db.query('SELECT * FROM user');
+  const [rows] = await opac.query('SELECT * FROM user');
   return rows;
 }
 
