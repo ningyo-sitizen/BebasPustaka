@@ -10,7 +10,11 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/weekly_visitor_page',(req,res) => {
-  res.sendFile(path.join(__dirname, 'public', 'weekly.html'))
+  res.sendFile(path.join(__dirname, 'public', 'approval.html'))
+})
+
+app.get('/', (req,res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'))
 })
 
 app.use('/', weekly_visitor_route);
