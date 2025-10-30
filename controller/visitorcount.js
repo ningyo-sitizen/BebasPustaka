@@ -1,15 +1,20 @@
-const db = require('../config');
-const {bebaspustaka} = require('../config')
+const { bebaspustaka } = require('../config');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
+exports.getYearlyVisitors = async (req, res) => {
+  try {
+    const sql = `
+      SELECT * from summary_yearly_visitor
+    `;
 
-async function get_visitorCount_weekly() {
-    const [rows] = await bebaspustaka.query("select * from bebaspustaka.summary_weekly_visitor")
-    return rows;
-}
+    const [rows] = await bebaspustaka.query(sql);
 
-async function get_visitor_year(params) {
-    const [rows] = await bebaspustaka.query("")
-    return rows;
-}
+    res.status(200).json(rows);
 
-module.exports = {get_visitorCount_weekly};
+  } catch (err) {
+    console.error('❌ Error fetching yearly visitors:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

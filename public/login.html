@@ -1,7 +1,42 @@
-<!DOCTYPE html>
-<head>
-    <title>LOGIN</title>
-</head>
 <body>
-    <h1>TESET</h1>
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input type="text" id="name" placeholder="Name" required /><br>
+    <input type="password" id="password" placeholder="Password" required /><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- ⬇️ script HARUS di sini -->
+  <script>
+    console.log("✅ Script loaded"); // test 1
+
+    const form = document.getElementById('loginForm');
+    console.log("Form element:", form); // test 2
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log("🟢 Form submitted"); // test 3
+
+      const name = document.getElementById('name').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password })
+      });
+
+      const data = await res.json();
+      console.log("Response:", data);
+      console.log("Status:", res.status);
+
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        alert('Login success');
+        window.location.href = '/dashboard';
+      } else {
+        alert(data.message);
+      }
+    });
+  </script>
 </body>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
+const { getYearlyVisitors } = require('../controller/visitorController');
+const verifyToken = require('../middleware/verifyToken'); //
 const { get_visitorCount_weekly } = require('../controller/visitorcount')
 
 
@@ -25,5 +26,7 @@ router.get('/weekly_visitor',async (req,res) =>{
  }
 
 })
+
+router.get('/yearly_visitor', verifyToken, getYearlyVisitors);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 
 const mysql = require('mysql2/promise');
-require('dotenv').config;
+require('dotenv').config();
 
 const opac = mysql.createPool({
   host: process.env.DB_HOST_OPAC,

@@ -1,27 +1,34 @@
-require('dotenv').config;
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const weekly_visitor_route = require('./routes/web');
-const PORT = process.env.PORT;
-
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+const verifyToken = require('./middleware/checktoken');
+const { getYearlyVisitors } = require('./controller/visitorcount');
 
 const app = express();
+const PORT = process.env.PORT || 8080;
 
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/weekly_visitor_page',(req,res) => {
-  res.sendFile(path.join(__dirname, 'public', 'approval.html'))
-})
+app.use('/api/auth', authRoutes);
 
-app.get('/', (req,res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'))
-})
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 
-app.use('/', weekly_visitor_route);
+app.get('/regis',(req,res) => {
+  res.sendFile(path.join(__dirname,'public','register.html'));
+});
 
-console.log(process.env.DB_DATABASE_OPAC)
-console.log(PORT)
-console.log(process.env)
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/yearly_visitor', verifyToken, getYearlyVisitors);
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
