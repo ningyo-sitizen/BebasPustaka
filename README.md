@@ -1,4 +1,6 @@
-![alt text](https://github.com/ningyo-sitizen/BebasPustaka/blob/master/public/logso.png?raw=true)
+<p align="center">
+  <img src="https://github.com/ningyo-sitizen/BebasPustaka/blob/master/public/logso.png" alt="alt text" />
+</p>
 
 
 
