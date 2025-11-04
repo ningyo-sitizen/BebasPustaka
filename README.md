@@ -1,3 +1,7 @@
+![alt text](https://github.com/ningyo-sitizen/BebasPustaka/blob/master/public/logso.png?raw=true)
+
+
+
 ## PENGANTAR
 
 File ini berisi tentang bagaimana developer membuat, mengisi, melakukan development project
