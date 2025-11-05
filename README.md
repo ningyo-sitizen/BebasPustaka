@@ -40,7 +40,7 @@ BACKEND + FRONTEND
 │
 └── [README.md](http://readme.md/) </pre>
 
-## format file harus sesuai dengan fungsinya
+## Format file harus sesuai dengan fungsinya
 
 **Pengertian:**
 
