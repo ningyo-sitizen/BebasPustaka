@@ -20,7 +20,7 @@ Sistem ini menyediakan alur verifikasi "bebas pustaka" untuk mahasiswa, memenuhi
 
 BACKEND + FRONTEND
 
-<pre> ```/bebas-pustaka-system
+<pre>/bebas-pustaka-system
 │
 ├── /server
 │   ├── /src
@@ -38,7 +38,7 @@ BACKEND + FRONTEND
 │   ├── .env
 │   └── .gitignore
 │
-└── [README.md](http://readme.md/) ``` </pre>
+└── [README.md](http://readme.md/) </pre>
 
 ## format file harus sesuai dengan fungsinya
 
