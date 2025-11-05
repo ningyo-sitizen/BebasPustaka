@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard Visitors & Loans</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  body { margin:0; font-family:Arial; background:#f5f6fa; }
+  .sidebar{width:230px;background:#2f4f6f;color:white;height:100vh;padding:20px;position:fixed;}
+  .sidebar a{color:white;text-decoration:none;display:block;padding:8px 0;}
+  .main{margin-left:250px;padding:20px;}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .chart-block{background:white;padding:15px;border-radius:10px;position:relative;}
+  table{width:100%;background:white;border-collapse:collapse;margin-top:10px;font-size:14px;}
+  th,td{padding:8px;border:1px solid #ddd;} th{background:#2f4f6f;color:white;}
+
+  .filter-btn {
+    position:absolute; right:10px; top:10px;
+    background:#2f4f6f; color:white;
+    padding:5px 8px; font-size:12px;
+    border:none; border-radius:5px;
+    cursor:pointer;
+  }
+
+  /* MODAL */
+  .modal {
+    display:none; position:fixed; z-index:1000;
+    left:0; top:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.4);
+    justify-content:center; align-items:center;
+  }
+  .modal-content {
+    background:white; padding:20px;
+    width:300px; border-radius:10px;
+    animation:fadeIn .2s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from{opacity:0; transform:translateY(-20px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+  .modal h3{margin-top:0;}
+  .modal button{padding:6px 10px;margin:5px;cursor:pointer;}
+  .btn-reset{background:#f1c40f;color:#000;}
+  .btn-apply{background:#2ecc71;color:white;}
+  .btn-cancel{background:#e74c3c;color:white;}
+
+  /* Checkbox container */
+  .checkbox-box {
+    max-height:120px;
+    overflow-y:auto;
+    border:1px solid #ccc;
+    padding:6px;
+    border-radius:5px;
+    background:#fafafa;
+    margin-bottom:10px;
+  }
+  .checkbox-box label {
+    display:block;
+    font-size:13px;
+    margin-bottom:4px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>Dashboard</h2>
+  <a href="#">Home</a>
+  <a href="#">Visitors</a>
+  <a href="#">Loans</a>
+  <a href="#">Logout</a>
+</div>
+
+<div class="main">
+  <h2>📊 Dashboard Statistik</h2>
+
+  <div class="charts">
+
+    <!-- VISITOR CHART -->
+    <div class="chart-block">
+      <button class="filter-btn" onclick="showModal('visitorModal')">Filter</button>
+      <canvas id="chartVisitor"></canvas>
+      <table id="visitorTable"><thead>
+        <tr><th>Periode</th><th>Total Visitors</th></tr>
+      </thead><tbody></tbody></table>
+    </div>
+
+    <!-- LOAN CHART -->
+    <div class="chart-block">
+      <button class="filter-btn" onclick="showModal('loanModal')">Filter</button>
+      <canvas id="chartLoan"></canvas>
+      <table id="loanTable"><thead>
+        <tr><th>Tahun</th><th>Lembaga</th><th>Prodi</th><th>Total Pinjam</th></tr>
+      </thead><tbody></tbody></table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Visitor Modal -->
+<div id="visitorModal" class="modal">
+<div class="modal-content">
+  <h3>Filter Visitors</h3>
+  Period:
+  <select id="v_period">
+    <option value="daily">Daily</option>
+    <option value="weekly">Weekly</option>
+    <option value="yearly">Yearly</option>
+  </select>
+  <br><br>
+  Year:
+  <select id="v_year"></select>
+  <br><br>
+
+  <button class="btn-cancel" onclick="closeModal('visitorModal')">Cancel</button>
+  <button class="btn-reset" onclick="resetVisitor()">Reset</button>
+  <button class="btn-apply" onclick="applyVisitor()">Apply</button>
+</div>
+</div>
+
+<!-- Loan Modal -->
+<div id="loanModal" class="modal">
+<div class="modal-content">
+  <h3>Filter Loans</h3>
+
+  Tahun:
+  <select id="l_year"></select><br><br>
+
+  Lembaga:
+  <div id="l_lembaga_box" class="checkbox-box"></div>
+
+  Program Studi:
+  <div id="l_prodi_box" class="checkbox-box"></div>
+
+  <button class="btn-cancel" onclick="closeModal('loanModal')">Cancel</button>
+  <button class="btn-reset" onclick="resetLoan()">Reset</button>
+  <button class="btn-apply" onclick="applyLoan()">Apply</button>
+</div>
+</div>
+
+<script>
+let token = localStorage.getItem("token");
+let cv, cl; // charts
+
+function showModal(id){ document.getElementById(id).style.display="flex"; }
+function closeModal(id){ document.getElementById(id).style.display="none"; }
+
+/*---------------- VISITOR ----------------*/
+async function loadVisitorYears(){
+  const r = await fetch("/api/dashboard/years",{headers:{Authorization:`Bearer ${token}`}});
+  const y = await r.json();
+  v_year.innerHTML = y.map(v=>`<option>${v}</option>`).join("");
+}
+
+async function loadVisitorChart(period="daily",year="2025"){
+  const res = await fetch(`/api/dashboard/visitor?period=${period}&year=${year}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const d = await res.json();
+
+  if(cv) cv.destroy();
+  cv = new Chart(chartVisitor,{
+    type:"line",
+    data:{labels:d.labels, datasets:[{data:d.data, borderWidth:2}]}
+  });
+
+  visitorTable.querySelector("tbody").innerHTML =
+    d.labels.map((t,i)=>`<tr><td>${t}</td><td>${d.data[i]}</td></tr>`).join("");
+}
+
+function resetVisitor(){
+  v_period.value="daily"; v_year.selectedIndex=0;
+}
+function applyVisitor(){
+  closeModal("visitorModal");
+  loadVisitorChart(v_period.value, v_year.value);
+}
+
+/*---------------- LOAN (CHECKBOX MODE) ----------------*/
+async function loadLoanFilters(){
+  const y = await (await fetch("/api/loan/angkatan",{headers:{Authorization:`Bearer ${token}`} })).json();
+  l_year.innerHTML = y.map(v=>`<option>${v}</option>`).join("");
+
+  const lemb = await (await fetch("/api/loan/lembaga",{headers:{Authorization:`Bearer ${token}`} })).json();
+  document.getElementById("l_lembaga_box").innerHTML =
+    lemb.map(v=>`<label><input type="checkbox" class="cbLembaga" value="${v}"> ${v}</label>`).join("");
+
+  loadProdi();
+}
+
+// Load prodi based on checked lembaga
+async function loadProdi(){
+  const lembChecked = [...document.querySelectorAll(".cbLembaga:checked")].map(c=>c.value).join(",");
+
+  const r = await fetch(`/api/loan/program?lembaga=${lembChecked}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const j = await r.json();
+
+  l_prodi_box.innerHTML =
+    j.map(v=>`<label><input type="checkbox" class="cbProdi" value="${v}"> ${v}</label>`).join("");
+}
+
+// If lembaga checkbox changed -> reload prodi list
+document.addEventListener("change",e=>{
+  if(e.target.classList.contains("cbLembaga")) loadProdi();
+});
+
+async function loadLoanChart(){
+  const year = l_year.value;
+  const lemb = [...document.querySelectorAll(".cbLembaga:checked")].map(c=>c.value);
+  const prodi = [...document.querySelectorAll(".cbProdi:checked")].map(c=>c.value);
+
+  const r = await fetch(`/api/loan/summary?tahun=${year}&lembaga=${lemb.join(",")}&program=${prodi.join(",")}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const j = await r.json();
+
+  if(cl) cl.destroy();
+  cl = new Chart(chartLoan,{
+    type:"pie",
+    data:{labels:j.map(v=>v.programs_studi), datasets:[{data:j.map(v=>v.total_pinjam)}]}
+  });
+
+  loanTable.querySelector("tbody").innerHTML =
+    j.map(v=>`<tr><td>${v.tahun}</td><td>${v.lembaga}</td><td>${v.programs_studi}</td><td>${v.total_pinjam}</td></tr>`).join("");
+}
+
+function resetLoan(){
+  document.querySelectorAll(".cbLembaga,.cbProdi").forEach(c=>c.checked=false);
+  l_year.selectedIndex=0;
+  loadProdi();
+}
+
+function applyLoan(){
+  closeModal("loanModal");
+  loadLoanChart();
+}
+
+/*---------------- INIT ----------------*/
+(async ()=>{
+  await loadVisitorYears();
+  await loadLoanFilters();
+  loadVisitorChart();
+  loadLoanChart();
+})();
+</script>
+
+</body>
+</html>

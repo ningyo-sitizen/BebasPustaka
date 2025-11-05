@@ -3,8 +3,11 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const visitorcount = require('./routes/web')
 const verifyToken = require('./middleware/checktoken');
 const { getYearlyVisitors } = require('./controller/visitorcount');
+const {getDashboardDatVisitor} = require('./controller/visitorcount')
+const dashboardvisitorroutes = require('./routes/web');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -16,18 +19,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 app.get('/regis',(req,res) => {
-  res.sendFile(path.join(__dirname,'public','register.html'));
+  res.sendFile(path.join(__dirname,'views','register.html'));
 });
 
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
+app.get('/pagebebaskompen',(req,res) => {
+  res.sendFile(path.join(__dirname,'views','bebaskompen.html'))
+})
+
 app.get('/yearly_visitor', verifyToken, getYearlyVisitors);
+
+app.use('/api/dashboard', require('./routes/web'));
+app.use('/api', require('./routes/web')); 
+
+app.use('/api/loan',require('./routes/loanRouts'))
 
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
